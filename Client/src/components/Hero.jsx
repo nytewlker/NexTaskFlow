@@ -34,7 +34,7 @@ const Hero = () => {
       </div>
 
       {/* Right Section */}
-      <div className="md:w-1/3 p-4 rounded-lg md:mt-0 shadow-lg bg-opacity-10 ">
+      <div className="md:w-1/3 mt p-6 rounded-lg md:mt-0 shadow-lg bg-slate-950 dark:bg-slate-800 dark:bg-opacity-10 bg-opacity-10 ">
         <h2 className="text-lg font-semibold">Sign up today to start shopping</h2>
 
         {/* Google Social Login Button */}

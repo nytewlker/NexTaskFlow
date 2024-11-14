@@ -1,146 +1,301 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Importing useNavigate for navigation
+import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [error, setError] = useState(null); // State to store any error message
-  const [success, setSuccess] = useState(false); // State to manage successful login/signup
-  const [role, setRole] = useState('user'); // Default role is user
+  const navigate = useNavigate();
 
-  const navigate = useNavigate(); // Initialize navigate hook
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    name: "",
+    role: "user",
+    verificationCode: "",
+    newPassword: "",
+  });
 
-  const handleSubmit = async (e) => {
+  const [uiState, setUiState] = useState({
+    isLogin: true,
+    isForgotPassword: false,
+    isCodeSent: false,
+    error: null,
+    success: false,
+  });
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleAuthSubmit = async (e) => {
     e.preventDefault();
-    setError(null); // Reset any previous errors
+
+    setUiState((prev) => ({ ...prev, error: null }));
 
     try {
-      const url = isLogin ? 'http://localhost:5000/api/auth/login' : 'http://localhost:5000/api/auth/signup';
-      const body = isLogin ? { email, password } : { name, email, password, role };
+      const url = uiState.isLogin
+        ? "http://localhost:5000/api/auth/login"
+        : "http://localhost:5000/api/auth/signup";
+
+      const body = uiState.isLogin
+        ? { email: formData.email, password: formData.password }
+        : {
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            role: formData.role,
+          };
 
       const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
 
-      // Check if the response is successful
       if (!response.ok) {
         const errorText = await response.text();
-        setError(`Error: ${errorText}`);
-        return;
+        throw new Error(errorText);
       }
 
       const data = await response.json();
 
-      // Store token if available
       if (data.token) {
-        localStorage.setItem('token', data.token);
-        setSuccess(true); // Set success state to true
-        navigate("/dashboard"); // Redirect to dashboard
+        localStorage.setItem("token", data.token);
+        setUiState((prev) => ({ ...prev, success: true }));
+        navigate("/dashboard");
       }
     } catch (error) {
-      console.error('Auth error:', error);
-      setError('An unexpected error occurred. Please try again.');
+      setUiState((prev) => ({
+        ...prev,
+        error:
+          error.message || "An unexpected error occurred. Please try again.",
+      }));
     }
   };
 
-  return (
-    <div id="auth" className="max-w-md mx-auto p-8 border- rounded-md">
-      <h2 className="text-2xl font-bold text-center mb-6">
-        {isLogin ? "Login" : "Create Account"}
-      </h2>
-      {error && (
-        <p className="text-red-500 text-center mb-4">{error}</p>
-      )}
-      {success && (
-        <p className="text-green-500 text-center mb-4">Successfully logged in! Redirecting...</p>
-      )}
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        {!isLogin && (
-          
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setUiState((prev) => ({ ...prev, error: null }));
+
+    try {
+      const url = !uiState.isCodeSent
+        ? "http://localhost:5000/api/auth/forgot-password"
+        : "http://localhost:5000/api/auth/reset-password";
+
+      const body = !uiState.isCodeSent
+        ? { email: formData.email }
+        : {
+            email: formData.email,
+            code: formData.verificationCode,
+            newPassword: formData.newPassword,
+          };
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText);
+      }
+
+      if (!uiState.isCodeSent) {
+        setUiState((prev) => ({ ...prev, isCodeSent: true }));
+      } else {
+        setUiState((prev) => ({
+          ...prev,
+          isForgotPassword: false,
+          isCodeSent: false,
+          success: true,
+        }));
+        navigate("/login");
+      }
+    } catch (error) {
+      setUiState((prev) => ({
+        ...prev,
+        error:
+          error.message || "An unexpected error occurred. Please try again.",
+      }));
+    }
+  };
+
+  const renderAuthForm = () => (
+    <form className="space-y-4" onSubmit={handleAuthSubmit}>
+      {!uiState.isLogin && (
+        <>
           <div>
             <label className="block text-sm">Your Name</label>
             <input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2  rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 rounded-md bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Your name"
             />
           </div>
-        )}
 
-        {!isLogin && (
           <div>
             <label className="block text-sm">Select Role</label>
             <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="w-full px-3 py-2  rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              name="role"
+              value={formData.role}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 rounded-md bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
+              <option className="bg-transparent" value="user">User</option>
+              <option className="bg-transparent"value="admin">Admin</option>
             </select>
           </div>
-        )}
+        </>
+      )}
 
-        <div>
-          <label className="block text-sm">Your email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 rounded-md  focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="name@flowbite.com"
-          />
-        </div>
+      <div>
+        <label className="block text-sm">Email</label>
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleInputChange}
+          className="w-full px-3 py-2 rounded-md bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="email@example.com"
+        />
+      </div>
 
-        <div>
-          <label className="block text-sm">Your password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2  rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="••••••••"
-          />
-        </div>
+      <div>
+        <label className="block text-sm">Password</label>
+        <input
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={handleInputChange}
+          className="w-full px-3 py-2 rounded-md bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="••••••••"
+        />
+      </div>
 
-        {isLogin && (
-          <div className="flex items-center justify-between">
-            <div>
-              <input type="checkbox" id="remember" className="text-blue-500" />
-              <label htmlFor="remember" className="ml-2 text-sm ">
-                Remember me
-              </label>
-            </div>
-            <a href="#" className="text-sm text-blue-400 hover:text-blue-500">
-              Lost Password?
-            </a>
-          </div>
-        )}
+      <button
+        type="submit"
+        className="w-full py-2 mt-4 bg-blue-600 hover:bg-blue-700 rounded-md text-white font-semibold"
+      >
+        {uiState.isLogin ? "Log In" : "Create Account"}
+      </button>
 
+      <div className="flex justify-between items-center mt-4">
         <button
-          type="submit"
-          className="w-full py-2 mt-4 bg-blue-600 hover:bg-blue-700 rounded-md text-white font-semibold"
+          type="button"
+          onClick={() =>
+            setUiState((prev) => ({ ...prev, isLogin: !prev.isLogin }))
+          }
+          className="text-blue-400 hover:text-blue-500"
         >
-          {isLogin ? "Log In" : "Create Account"}
+          {uiState.isLogin ? "Create account" : "Back to login"}
         </button>
 
-        <p className="text-center text-sm  mt-4">
-          {isLogin ? "Not registered? " : "Already have an account? "}
+        {uiState.isLogin && (
           <button
             type="button"
-            onClick={() => setIsLogin(!isLogin)}
+            onClick={() =>
+              setUiState((prev) => ({ ...prev, isForgotPassword: true }))
+            }
             className="text-blue-400 hover:text-blue-500"
           >
-            {isLogin ? "Create account" : "Log in"}
+            Forgot Password?
           </button>
+        )}
+      </div>
+    </form>
+  );
+
+  const renderForgotPasswordForm = () => (
+    <form className="space-y-4" onSubmit={handleForgotPassword}>
+      <h3 className="text-xl font-bold text-center mb-4">Reset Password</h3>
+
+      <div>
+        <label className="block text-sm">Email</label>
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleInputChange}
+          className="w-full px-3 py-2 rounded-md bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Enter your email"
+        />
+      </div>
+
+      {uiState.isCodeSent && (
+        <>
+          <div>
+            <label className="block text-sm">Verification Code</label>
+            <input
+              type="text"
+              name="verificationCode"
+              value={formData.verificationCode}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 rounded-md bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter verification code"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm">New Password</label>
+            <input
+              type="password"
+              name="newPassword"
+              value={formData.newPassword}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 rounded-md bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter new password"
+            />
+          </div>
+        </>
+      )}
+
+      <button
+        type="submit"
+        className="w-full py-2 mt-4 bg-blue-600 hover:bg-blue-700 rounded-md text-white font-semibold"
+      >
+        {!uiState.isCodeSent ? "Send Verification Code" : "Reset Password"}
+      </button>
+
+      <button
+        type="button"
+        onClick={() =>
+          setUiState((prev) => ({
+            ...prev,
+            isForgotPassword: false,
+            isCodeSent: false,
+            error: null,
+          }))
+        }
+        className="w-full text-center text-sm text-blue-400 hover:text-blue-500"
+      >
+        Back to Login
+      </button>
+    </form>
+  );
+
+  return (
+    <div id="auth" className="max-w-md mx-auto p-4 border rounded-md">
+      <h2 className="text-2xl font-bold text-center mb-6">
+        {uiState.isLogin ? "Login" : "Create Account"}
+      </h2>
+
+      {uiState.error && (
+        <p className="text-red-500 text-center mb-4">{uiState.error}</p>
+      )}
+
+      {uiState.success && (
+        <p className="text-green-500 text-center mb-4">
+          Successfully {uiState.isLogin ? "logged in" : "registered"}!
+          Redirecting...
         </p>
-      </form>
+      )}
+
+      {uiState.isForgotPassword ? renderForgotPasswordForm() : renderAuthForm()}
     </div>
   );
 };

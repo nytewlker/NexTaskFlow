@@ -17,7 +17,6 @@ const About = ({ darkMode }) => {
             At ShopFlow, we are committed to providing top-quality products with unmatched customer service, helping you make informed decisions and get the most out of your shopping experience.
           </p>
           <div className="grid grid-cols-2 gap-4">
-            <a href="#about-us" className="text-blue-500 hover:text-blue-800 ">About Us</a>
             <a href="#contact" className="text-blue-500 hover:text-blue-800 ">Contact Us</a>
           </div>
         </div>

@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
+import EmployerDashboard from "./pages/dsb";
 
 function App() {
   const savedDarkMode = JSON.parse(localStorage.getItem("darkMode"));
@@ -34,6 +35,7 @@ function App() {
         {/* Routes */}
         <Routes>
           <Route path="/Dashboard" element={<Dashboard />} />
+          <Route path="/dsb" element={<EmployerDashboard />} />
         </Routes>
         {/* Footer */}
         <Footer darkMode={darkMode}/>
