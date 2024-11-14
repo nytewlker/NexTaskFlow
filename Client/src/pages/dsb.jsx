@@ -1,142 +1,117 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
-// Initial sample tasks data
-const initialTasks = [
-  { id: 1, title: "Task 1", description: "Complete the project proposal", status: "todo" },
-  { id: 2, title: "Task 2", description: "Review design documents", status: "in-progress" },
-  { id: 3, title: "Task 3", description: "Fix bugs in the application", status: "done" },
-];
-
-const TaskManager = () => {
-  const [tasks, setTasks] = useState(initialTasks);
-  const [newTask, setNewTask] = useState({ title: "", description: "", status: "todo" });
-  const [showModal, setShowModal] = useState(false);
-
-  // Task creation handler
-  const handleCreateTask = () => {
-    setTasks([
-      ...tasks,
-      { id: tasks.length + 1, ...newTask },
-    ]);
-    setNewTask({ title: "", description: "", status: "todo" });
-    setShowModal(false);
-  };
-
-  // Task status update handler
-  const handleStatusChange = (id, newStatus) => {
-    setTasks(
-      tasks.map(task =>
-        task.id === id ? { ...task, status: newStatus } : task
-      )
-    );
-  };
-
-  // Modal toggle handler
-  const toggleModal = () => setShowModal(!showModal);
-
-  // Task Columns
-  const columns = {
-    todo: "To Do",
-    "in-progress": "In Progress",
-    done: "Done"
-  };
-
+const Dashboard = () => {
   return (
-    <div className="min-h-screen py-10">
-      {/* Header */}
-      <header className="py-10 p-4">
-        <div className="flex justify-between items-center">
-          <h1 className="text-lg sm:text-xl font-semibold">
-            Task Manager
-          </h1>
-          <button
-            onClick={toggleModal}
-            className="px-4 py-2 rounded bg-blue-500 text-white"
-          >
-            Create New Task
-          </button>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <div className="flex flex-col lg:flex-row gap-6 p-4">
-        {/* Kanban Board */}
-        <div className="flex gap-4 w-full">
-          {Object.keys(columns).map((column) => (
-            <div key={column} className="flex-1 bg-gray-100 dark:bg-gray-800 p-4 rounded-md shadow">
-              <h2 className="text-lg font-semibold mb-4">{columns[column]}</h2>
-              <div className="space-y-4">
-                {tasks
-                  .filter(task => task.status === column)
-                  .map(task => (
-                    <div
-                      key={task.id}
-                      className="bg-white dark:bg-gray-700 p-4 rounded-md shadow cursor-pointer"
-                    >
-                      <h3 className="text-md font-semibold">{task.title}</h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">{task.description}</p>
-                      <div className="mt-4 space-x-2">
-                        {Object.keys(columns).map(status => (
-                          status !== task.status && (
-                            <button
-                              key={status}
-                              onClick={() => handleStatusChange(task.id, status)}
-                              className={`px-2 py-1 rounded ${
-                                status === "done"
-                                  ? "bg-green-500"
-                                  : status === "in-progress"
-                                  ? "bg-yellow-500"
-                                  : "bg-blue-500"
-                              } text-white text-sm`}
-                            >
-                              Move to {columns[status]}
-                            </button>
-                          )
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </div>
-          ))}
+    <div className="flex min-h-screen bg-gray-100 text-gray-800">
+      {/* Sidebar */}
+      <div className="w-64 p-4 bg-white shadow-md">
+        <div className="text-xl font-semibold mb-4">iotask</div>
+        <nav className="space-y-2">
+          <a href="#" className="block p-2 rounded-md text-gray-600 hover:bg-blue-50">
+            Dashboard
+          </a>
+          <a href="#" className="block p-2 rounded-md text-gray-600 hover:bg-blue-50">
+            Projects
+          </a>
+          <a href="#" className="block p-2 rounded-md text-gray-600 hover:bg-blue-50">
+            Tasks
+          </a>
+          <a href="#" className="block p-2 rounded-md text-gray-600 hover:bg-blue-50">
+            Kanban Desk
+          </a>
+          <a href="#" className="block p-2 rounded-md text-gray-600 hover:bg-blue-50">
+            Calendar
+          </a>
+          <a href="#" className="block p-2 rounded-md text-gray-600 hover:bg-blue-50">
+            Contacts
+          </a>
+          <a href="#" className="block p-2 rounded-md text-gray-600 hover:bg-blue-50">
+            All Apps
+          </a>
+        </nav>
+        <div className="mt-4">
+          <h3 className="text-sm font-semibold text-gray-500">Latest Projects</h3>
+          <ul className="mt-2 space-y-1">
+            <li className="text-sm text-gray-600">UI/UX Inspiration</li>
+            <li className="text-sm text-gray-600">Theme Development</li>
+            <li className="text-sm text-gray-600">Campaign Design</li>
+            <li className="text-sm text-gray-600">Content Creation</li>
+            <li className="text-sm text-gray-600">SaaS Template Design</li>
+          </ul>
         </div>
       </div>
 
-      {/* Create Task Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-md w-96 shadow-lg">
-            <h3 className="text-lg font-semibold mb-4">Create a New Task</h3>
-            <input
-              type="text"
-              placeholder="Task Title"
-              value={newTask.title}
-              onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-              className="w-full mb-4 p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
-            />
-            <textarea
-              placeholder="Task Description"
-              value={newTask.description}
-              onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-              className="w-full mb-4 p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
-            ></textarea>
-            <button
-              onClick={handleCreateTask}
-              className="px-4 py-2 rounded bg-green-500 text-white mr-2"
-            >
-              Create Task
-            </button>
-            <button
-              onClick={toggleModal}
-              className="px-4 py-2 rounded bg-red-500 text-white"
-            >
-              Cancel
-            </button>
+      {/* Main Content */}
+      <div className="flex-1 p-6">
+        <header className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Dashboard</h2>
+          <input
+            type="text"
+            placeholder="Search for tasks and etc."
+            className="p-2 border rounded-md border-gray-300"
+          />
+        </header>
+
+        {/* Tasks Overview */}
+        <div className="mt-6 grid grid-cols-2 gap-6">
+          <div className="p-4 bg-white shadow rounded-md">
+            <h3 className="text-sm font-semibold text-gray-500">New tasks</h3>
+            <p className="text-2xl font-semibold">345</p>
+            <div className="mt-2 h-1 w-full bg-green-200 rounded-md">
+              <div className="h-1 bg-green-500 rounded-md" style={{ width: "70%" }}></div>
+            </div>
+          </div>
+          <div className="p-4 bg-white shadow rounded-md">
+            <h3 className="text-sm font-semibold text-gray-500">Tasks done</h3>
+            <p className="text-2xl font-semibold">128</p>
+            <div className="mt-2 h-1 w-full bg-blue-200 rounded-md">
+              <div className="h-1 bg-blue-500 rounded-md" style={{ width: "40%" }}></div>
+            </div>
           </div>
         </div>
-      )}
+
+        {/* Tasks and Events */}
+        <div className="mt-6 grid grid-cols-2 gap-6">
+          <div className="p-4 bg-white shadow rounded-md">
+            <h3 className="text-sm font-semibold text-gray-500">Pending tasks</h3>
+            <p className="text-sm text-gray-700 mt-2">Design search page</p>
+            <p className="text-xs text-gray-500">Due date: 08 Dec 2024</p>
+            <div className="flex items-center mt-2">
+              <img src="avatar1.jpg" alt="Avatar" className="h-6 w-6 rounded-full" />
+              <img src="avatar2.jpg" alt="Avatar" className="h-6 w-6 rounded-full -ml-2" />
+              {/* Add more avatars as needed */}
+            </div>
+          </div>
+          <div className="p-4 bg-white shadow rounded-md">
+            <h3 className="text-sm font-semibold text-gray-500">Upcoming events</h3>
+            <p className="text-sm text-gray-700 mt-2">Meeting about website design</p>
+            <p className="text-xs text-gray-500">Event date: 14 Dec 2024</p>
+            <div className="flex items-center mt-2">
+              <img src="avatar3.jpg" alt="Avatar" className="h-6 w-6 rounded-full" />
+              <img src="avatar4.jpg" alt="Avatar" className="h-6 w-6 rounded-full -ml-2" />
+              {/* Add more avatars as needed */}
+            </div>
+          </div>
+        </div>
+
+        {/* Latest Activity */}
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold">Latest Activity</h3>
+          <ul className="mt-4 space-y-2">
+            <li className="p-4 bg-white shadow rounded-md flex justify-between">
+              <span>Loretta added 3 sub-tasks</span>
+              <span className="text-xs text-gray-500">10 mins ago</span>
+            </li>
+            <li className="p-4 bg-white shadow rounded-md flex justify-between">
+              <span>Richard created a new project</span>
+              <span className="text-xs text-gray-500">10 mins ago</span>
+            </li>
+            {/* Add more activity items as needed */}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default TaskManager;
+export default Dashboard;

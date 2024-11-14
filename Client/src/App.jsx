@@ -5,10 +5,19 @@ import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import EmployerDashboard from "./pages/dsb";
+import ProjectDashboard from "./pages/empl";
+import KanbanBoard from "./pages/kenben";
 
 function App() {
   const savedDarkMode = JSON.parse(localStorage.getItem("darkMode"));
   const [darkMode, setDarkMode] = useState(savedDarkMode || false);
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("userData")) || null);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);  // Update state to reflect user logout
+  };
 
   useEffect(() => {
     localStorage.setItem("darkMode", JSON.stringify(darkMode));
@@ -25,20 +34,19 @@ function App() {
     <Router>
       <div className={`antialiased  hiw-full`}>
         {/* Navbar */}
-        <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
+        <Navbar darkMode={darkMode} setDarkMode={setDarkMode} user={user} handleLogout={handleLogout} />
 
         {/* Routes */}
         <Routes>
           <Route path="/" element={<Home />} />
-        </Routes>
-        
-        {/* Routes */}
-        <Routes>
-          <Route path="/Dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dsb" element={<EmployerDashboard />} />
+          <Route path="/empl" element={<ProjectDashboard />} />
+          <Route path="/kn" element={<KanbanBoard />} />
         </Routes>
+
         {/* Footer */}
-        <Footer darkMode={darkMode}/>
+        <Footer darkMode={darkMode} />
       </div>
     </Router>
   );

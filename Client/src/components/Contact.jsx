@@ -1,9 +1,8 @@
 import axios from "axios";
 import React, { useState } from "react";
 
-// This is a functional component called Contact
-const Contact = () => {
-
+// This is a functional component called ContactTaskManager
+const ContactTaskManager = () => {
   // This is a state variable that holds the form data
   const [formData, setFormData] = useState({
     firstName: "",
@@ -13,9 +12,7 @@ const Contact = () => {
     message: "",
     services: [],
   });
-  
 
-  
   // This function handles input changes in the form
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -36,7 +33,6 @@ const Contact = () => {
     }));
   };
 
-
   // This function handles form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,7 +46,7 @@ const Contact = () => {
           message: formData.message
         }
       });
-      
+
       if (response.status === 200) {
         alert("Message sent successfully!");
         setFormData({
@@ -75,7 +71,7 @@ const Contact = () => {
         <div>
           <h2 className="text-4xl font-bold mb-8">Get in Touch</h2>
           <p className="mb-6">
-            We’re here to help! Reach out to us for product inquiries, support, or any other questions. We aim to respond within 24 hours.
+            We're here to support you with any task management queries, setup assistance, or feature inquiries. Reach out, and we'll respond as soon as possible.
           </p>
 
           {/* Form */}
@@ -134,9 +130,9 @@ const Contact = () => {
 
             {/* Services Selection */}
             <div>
-              <label className="text-lg font-semibold">Services</label>
+              <label className="text-lg font-semibold">How can we help?</label>
               <div className="flex flex-wrap gap-4 mt-2">
-                {["Product Inquiry", "Order Support", "Return & Exchange", "Wholesale Inquiries", "Other"].map((service) => (
+                {["Task Setup", "Feature Inquiry", "Bug Report", "Account Assistance", "Other"].map((service) => (
                   <label key={service} className="flex items-center space-x-2">
                     <input
                       type="checkbox"
@@ -163,14 +159,14 @@ const Contact = () => {
           </form>
         </div>
 
-        {/* Map and Contact Info */}
+        {/* Contact Info */}
         <div className="flex flex-col items-center">
           <div className="mb-6 text-center">
-            <p className="text-gray-900 dark:text-gray-300">You can also reach us via:</p>
+            <p className="text-gray-900 dark:text-gray-300">Reach us via:</p>
             <div className="flex space-x-4 justify-center mt-4">
               <a href="#chat" className="text-blue-400 hover:text-blue-500">Start a live chat</a>
-              <a href="mailto:support@shopflow.com" className="text-blue-400 hover:text-blue-500">Email us</a>
-              <a href="https://twitter.com/shopflow" target="_blank" className="text-blue-400 hover:text-blue-500">Twitter</a>
+              <a href="mailto:support@taskflow.com" className="text-blue-400 hover:text-blue-500">Email us</a>
+              <a href="https://twitter.com/taskflow" target="_blank" className="text-blue-400 hover:text-blue-500">Twitter</a>
             </div>
           </div>
 
@@ -190,5 +186,4 @@ const Contact = () => {
   );
 };
 
-export default Contact;
-
+export default ContactTaskManager;

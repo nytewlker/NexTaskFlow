@@ -1,6 +1,6 @@
 import React from "react";
 
-const About = ({ darkMode }) => {
+const AboutTaskManager = ({ darkMode }) => {
   return (
     <div
       id="about"
@@ -11,33 +11,35 @@ const About = ({ darkMode }) => {
         {/* Left Section: Mission Statement */}
         <div className="lg:w-1/2 space-y-6 mb-8 lg:mb-0">
           <h2 className="text-4xl font-bold">
-            We offer <span className="text-blue-400">the best deals and products</span> for your everyday needs.
+            Take control of your projects with <span className="text-blue-400">TaskFlow</span> - Your ultimate productivity companion.
           </h2>
           <p className="text-lg">
-            At ShopFlow, we are committed to providing top-quality products with unmatched customer service, helping you make informed decisions and get the most out of your shopping experience.
+            At TaskFlow, our mission is to streamline task management for teams and individuals, making project tracking effortless and boosting productivity.
           </p>
           <div className="grid grid-cols-2 gap-4">
-            <a href="#contact" className="text-blue-500 hover:text-blue-800 ">Contact Us</a>
+            <a href="#contact" className="text-blue-500 hover:text-blue-800">
+              Contact Support
+            </a>
           </div>
         </div>
 
         {/* Right Section: Key Metrics */}
         <div className="lg:w-1/2 grid grid-cols-2 gap-8 text-center">
           <div>
-            <h3 className="text-3xl font-semibold">1M+</h3>
-            <p className="text-sm text-gray-800 dark:text-gray-400">Over 1 million happy customers worldwide.</p>
+            <h3 className="text-3xl font-semibold">20k+</h3>
+            <p className="text-sm text-gray-800 dark:text-gray-400">Over 20,000 tasks completed by our users.</p>
           </div>
           <div>
-            <h3 className="text-3xl font-semibold">500+</h3>
-            <p className="text-sm text-gray-800 dark:text-gray-400">More than 500 product categories.</p>
+            <h3 className="text-3xl font-semibold">1,500+</h3>
+            <p className="text-sm text-gray-800 dark:text-gray-400">More than 1,500 projects successfully tracked.</p>
+          </div>
+          <div>
+            <h3 className="text-3xl font-semibold">99.9%</h3>
+            <p className="text-sm text-gray-800 dark:text-gray-400">Uptime for a reliable task management experience.</p>
           </div>
           <div>
             <h3 className="text-3xl font-semibold">24/7</h3>
-            <p className="text-sm text-gray-800 dark:text-gray-400">Customer support available 24/7 for all your needs.</p>
-          </div>
-          <div>
-            <h3 className="text-3xl font-semibold">100%</h3>
-            <p className="text-sm text-gray-800 dark:text-gray-400">Satisfaction guaranteed on every purchase.</p>
+            <p className="text-sm text-gray-800 dark:text-gray-400">Support available anytime to help you stay on track.</p>
           </div>
         </div>
       </div>
@@ -45,4 +47,4 @@ const About = ({ darkMode }) => {
   );
 };
 
-export default About;
+export default AboutTaskManager;

@@ -30,7 +30,6 @@ const Auth = () => {
 
   const handleAuthSubmit = async (e) => {
     e.preventDefault();
-
     setUiState((prev) => ({ ...prev, error: null }));
 
     try {
@@ -61,15 +60,23 @@ const Auth = () => {
       const data = await response.json();
 
       if (data.token) {
+        // Save both token and user data
         localStorage.setItem("token", data.token);
+        localStorage.setItem("userData", JSON.stringify({
+          email: formData.email,
+          name: data.name || formData.name,
+          role: data.role,
+          id: data.id
+        }));
+        
         setUiState((prev) => ({ ...prev, success: true }));
-        navigate("/dashboard");
+        navigate(data.role === 'admin' ? '/dsb' : '/Dashboard');
       }
+      
     } catch (error) {
       setUiState((prev) => ({
         ...prev,
-        error:
-          error.message || "An unexpected error occurred. Please try again.",
+        error: error.message || "An unexpected error occurred. Please try again.",
       }));
     }
   };
