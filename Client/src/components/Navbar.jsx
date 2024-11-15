@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaMoon, FaSun, FaBars, FaTimes, FaUserCircle } from "react-icons/fa";
+import { FaMoon, FaSun, FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const Navbar = ({ darkMode, setDarkMode, user, handleLogout }) => {
@@ -38,19 +38,19 @@ const Navbar = ({ darkMode, setDarkMode, user, handleLogout }) => {
   return (
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        isScrolled ? "p-2 bg-gray-800 shadow-md" : "p-4"
+        isScrolled ? "p-2 shadow-md" : "p-4"
       }`}
     >
-      <div className="flex justify-between items-center px-4 md:px-8">
+      <div className="flex justify-between items-center px-4 md:px-4">
         {/* Logo */}
         <div
           onClick={() => handleLinkClick("/")}
           className="text-xl font-bold flex items-center cursor-pointer"
         >
           <img
-            src={darkMode ? "/logo-dark.png" : "/logo-light.png"}
+            src={darkMode ? "/logo.png" : "/favicon.png"}
             alt="Logo"
-            className="h-10"
+            className="h-5"
           />
           <span className="ml-2 hidden sm:inline">Addie's World</span>
         </div>
