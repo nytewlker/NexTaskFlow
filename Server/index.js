@@ -1,5 +1,4 @@
 const express = require("express");
-const mongoose = require('mongoose');
 const cors = require("cors");
 var bodyParser = require('body-parser');
 
@@ -14,8 +13,8 @@ const app = express();
 
 app.use(cors({ origin: "http://localhost:5173" }));
 
-app.use(bodyParser.json()); // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({ extended: true })); // to support URL-encoded bodies
+app.use(bodyParser.json()); 
+app.use(bodyParser.urlencoded({ extended: true })); 
 
 app.use('/api', contactRoutes);
 app.use('/api', require('./routes/fetchRoute'));
