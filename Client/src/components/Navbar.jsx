@@ -52,7 +52,7 @@ const Navbar = ({ darkMode, setDarkMode, user, handleLogout }) => {
             alt="Logo"
             className="h-5"
           />
-          <span className="ml-2 hidden sm:inline">Addie's World</span>
+          <span className="ml-2 hidden sm:inline">NexTaskFlow</span>
         </div>
 
         {/* Dark Mode Toggle */}

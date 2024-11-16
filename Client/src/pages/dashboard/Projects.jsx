@@ -1,26 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const ProjectDashboard = () => {
-  const [projects, setProjects] = useState([
-    { id: 1, name: "Project Alpha", description: "Alpha Description", status: "Development", manager: "John Doe", isActive: true },
-    { id: 2, name: "Project Beta", description: "Beta Description", status: "Testing", manager: "Jane Smith", isActive: false },
-    { id: 3, name: "Project Gamma", description: "Gamma Description", status: "Design", manager: "Jim Beam", isActive: true },
-  ]);
-
+  const [projects, setProjects] = useState([]);
   const [currentProject, setCurrentProject] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isViewing, setIsViewing] = useState(false);
+  const [users, setUsers] = useState([]);
 
-  // Open Add/Edit Modal
+  useEffect(() => {
+    // Fetch projects from placeholder API
+    axios
+      .get("http://localhost:5000/api/projects/")
+      .then((response) => setProjects(response.data.slice(0, 6)));
+
+    // Fetch users for assignments
+    axios
+      .get("http://localhost:5000/api/users")
+      .then((response) => setUsers(response.data))
+      .catch((err) => console.error("Error fetching users:", err));
+  }, []);
+
   const handleOpenModal = (project = null, editMode = false, viewMode = false) => {
-    setCurrentProject(project || { name: "", description: "", status: "Development", manager: "", isActive: true });
+    // Ensure the project.id is set correctly in the state
+    setCurrentProject(
+      project || { name: "", body: "", status: "Development", assignee: "", isActive: true, id: "" }
+    );
     setIsEditing(editMode);
     setIsViewing(viewMode);
     setIsModalOpen(true);
   };
 
-  // Close Modal
   const handleCloseModal = () => {
     setCurrentProject(null);
     setIsModalOpen(false);
@@ -28,152 +39,165 @@ const ProjectDashboard = () => {
     setIsViewing(false);
   };
 
-  // Handle Save
   const handleSave = () => {
-    if (isEditing) {
-      setProjects((prev) =>
-        prev.map((proj) =>
-          proj.id === currentProject.id ? { ...proj, ...currentProject } : proj
-        )
-      );
-    } else {
-      setProjects((prev) => [
-        ...prev,
-        { id: projects.length + 1, ...currentProject },
-      ]);
+    if (!currentProject.name || !currentProject.body || !currentProject.assignee) {
+      alert("All fields are required!");
+      return;
     }
-    handleCloseModal();
+  
+    const projectData = {
+      name: currentProject.name,
+      body: currentProject.body,
+      status: currentProject.status,
+      assignee: currentProject.assignee,
+      isActive: currentProject.isActive,
+    };
+  
+    if (isEditing && currentProject.id) {
+      // Ensure currentProject.id exists before sending the PUT request
+      axios
+        .put(`http://localhost:5000/api/projects/update/${currentProject.id}`, projectData)
+        .then(() => {
+          setProjects((prev) =>
+            prev.map((proj) => (proj.id === currentProject.id ? currentProject : proj))
+          );
+          handleCloseModal();
+        })
+        .catch((err) => console.error("Error updating project:", err));
+    } else {
+      // If the id is undefined or empty, it will create a new project
+      axios
+        .post("http://localhost:5000/api/projects/add", projectData)
+        .then((response) => {
+          setProjects((prev) => [...prev, { ...response.data }]);
+          handleCloseModal();
+        })
+        .catch((err) => console.error("Error adding project:", err));
+    }
+  };
+
+  const handleDelete = (id) => {
+    if (id) {
+      axios.delete(`http://localhost:5000/api/projects/delete/${id}`).then(() => {
+        setProjects((prev) => prev.filter((p) => p.id !== id));
+      }).catch((err) => {
+        console.error("Error deleting project:", err);
+      });
+    } else {
+      console.error("Project ID is undefined");
+    }
   };
 
   return (
-    <div id="#projects" className="flex py-10 min-h-screen">
-      <main className="flex-1 p-6">
-        {/* Header */}
-        <header className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold">All Projects</h2>
-          <button
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600"
-            onClick={() => handleOpenModal()}
-          >
-            Add New Project
-          </button>
-        </header>
+    <div className="min-h-screen bg-gray-100 p-6">
+      {/* Header */}
+      <header className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Project Dashboard</h1>
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          onClick={() => handleOpenModal()}
+        >
+          Add New Project
+        </button>
+      </header>
 
-        {/* Project Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project) => (
-            <div
-              key={project.id}
-              className="p-4 bg-white shadow-sm rounded-lg"
-              style={{ borderRadius: "15px" }}
-            >
-              <h3 className="text-lg font-bold text-gray-700 mb-2">{project.name}</h3>
-              <p className="text-sm text-gray-500 mb-1">Status: {project.status}</p>
-              <p className="text-sm text-gray-500">Active: {project.isActive ? "Yes" : "No"}</p>
-              <div className="flex justify-between mt-4">
-                <button
-                  className="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600"
-                  onClick={() => handleOpenModal(project, false, true)}
-                >
-                  View
-                </button>
-                <button
-                  className="px-3 py-1 bg-yellow-400 text-white rounded-lg hover:bg-yellow-500"
-                  onClick={() => handleOpenModal(project, true)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                  onClick={() => setProjects((prev) => prev.filter((p) => p.id !== project.id))}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Modal */}
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 max-w-md">
-              {isViewing ? (
-                <div>
-                  <h3 className="text-xl font-bold mb-4">Project Details</h3>
-                  <p className="mb-2"><strong>Name:</strong> {currentProject.name}</p>
-                  <p className="mb-2"><strong>Description:</strong> {currentProject.description}</p>
-                  <p className="mb-2"><strong>Status:</strong> {currentProject.status}</p>
-                  <p className="mb-2"><strong>Manager:</strong> {currentProject.manager}</p>
-                  <p className="mb-2"><strong>Active:</strong> {currentProject.isActive ? "Yes" : "No"}</p>
-                  <button
-                    className="mt-4 px-4 py-2 bg-gray-300 rounded-md"
-                    onClick={handleCloseModal}
-                  >
-                    Close
-                  </button>
-                </div>
-              ) : (
-                <div>
-                  <h3 className="text-xl font-bold mb-4">{isEditing ? "Edit Project" : "Add Project"}</h3>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">Project Name</label>
-                    <input
-                      type="text"
-                      className="w-full p-2 border rounded-md"
-                      value={currentProject.name}
-                      onChange={(e) => setCurrentProject({ ...currentProject, name: e.target.value })}
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">Description</label>
-                    <textarea
-                      className="w-full p-2 border rounded-md"
-                      value={currentProject.description}
-                      onChange={(e) => setCurrentProject({ ...currentProject, description: e.target.value })}
-                    ></textarea>
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">Status</label>
-                    <select
-                      className="w-full p-2 border rounded-md"
-                      value={currentProject.status}
-                      onChange={(e) => setCurrentProject({ ...currentProject, status: e.target.value })}
-                    >
-                      <option value="Development">Development</option>
-                      <option value="Testing">Testing</option>
-                      <option value="Design">Design</option>
-                    </select>
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">Manager</label>
-                    <input
-                      type="text"
-                      className="w-full p-2 border rounded-md"
-                      value={currentProject.manager}
-                      onChange={(e) => setCurrentProject({ ...currentProject, manager: e.target.value })}
-                    />
-                  </div>
-                  <div className="flex justify-end space-x-2">
-                    <button
-                      className="px-4 py-2 bg-gray-300 rounded-md"
-                      onClick={handleCloseModal}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                      onClick={handleSave}
-                    >
-                      Save
-                    </button>
-                  </div>
-                </div>
-              )}
+      {/* Projects */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {projects.map((project) => (
+          <div key={project.id} className="bg-white p-4 rounded shadow">
+            <h2 className="font-bold mb-2">{project.name}</h2>
+            <p className="text-sm text-gray-600 mb-4">{project.body}</p>
+            <div className="flex justify-between">
+              <button
+                className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                onClick={() => handleOpenModal(project, false, true)}
+              >
+                View
+              </button>
+              <button
+                className="bg-yellow-400 text-white px-3 py-1 rounded hover:bg-yellow-500"
+                onClick={() => handleOpenModal(project, true)}
+              >
+                Edit
+              </button>
+              <button
+                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                onClick={() => handleDelete(project.id)}
+              >
+                Delete
+              </button>
             </div>
           </div>
-        )}
-      </main>
+        ))}
+      </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg w-11/12 max-w-md">
+            {isViewing ? (
+              <div>
+                <h3 className="text-xl font-bold mb-4">Project Details</h3>
+                <p><strong>name:</strong> {currentProject.name}</p>
+                <p><strong>Description:</strong> {currentProject.body}</p>
+                <p><strong>Status:</strong> {currentProject.status}</p>
+                <p>
+                  <strong>Assigned To:</strong> {users.find((u) => currentProject.assignee)?.name || "Unassigned"}
+                </p>
+                <button
+                  className="mt-4 bg-gray-300 px-4 py-2 rounded"
+                  onClick={handleCloseModal}
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <div>
+                <h3 className="text-xl font-bold mb-4">{isEditing ? "Edit Project" : "Add Project"}</h3>
+                <input
+                  type="text"
+                  className="w-full mb-4 px-3 py-2 border rounded"
+                  placeholder="Project name"
+                  value={currentProject.name}
+                  onChange={(e) => setCurrentProject({ ...currentProject, name: e.target.value })}
+                />
+                <textarea
+                  className="w-full mb-4 px-3 py-2 border rounded"
+                  placeholder="Description"
+                  value={currentProject.body}
+                  onChange={(e) => setCurrentProject({ ...currentProject, body: e.target.value })}
+                />
+                <select
+                  className="w-full mb-4 px-3 py-2 border rounded"
+                  value={currentProject.assignee || ""}
+                  onChange={(e) => setCurrentProject({ ...currentProject, assignee: e.target.value || "" })}
+                >
+                  <option value="">Assign To</option>
+                  {users.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="flex justify-end space-x-2">
+                  <button
+                    className="bg-gray-300 px-4 py-2 rounded"
+                    onClick={handleCloseModal}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    onClick={handleSave}
+                  >
+                    {isEditing ? "Save Changes" : "Add Project"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

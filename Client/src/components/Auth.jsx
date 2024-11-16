@@ -8,7 +8,7 @@ const Auth = () => {
     email: "",
     password: "",
     name: "",
-    role: "user",
+    role: "",
     verificationCode: "",
     newPassword: "",
   });
