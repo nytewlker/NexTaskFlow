@@ -8,6 +8,8 @@ import Projects from "./pages/dashboard/Projects";
 import TaskManager from "./pages/dashboard/task";
 import Dashboard from "./pages/dashboard/dsb";
 
+import UserList from "./pages/dashboard/userList";
+
 function App() {
   const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
   const savedDarkMode = JSON.parse(localStorage.getItem("darkMode"));
@@ -54,6 +56,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="projects" element={<Projects />} />
             <Route path="tasks" element={<TaskManager />} />
+            <Route path="users" element={<UserList />} />
           </Route>
         </Routes>
 

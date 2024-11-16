@@ -2,6 +2,7 @@ import React from "react";
 import RecentActivity from "./RecentActivity"; // Ensure this path is correct
 import ProjectDashboard from "./Projects";
 import TaskManager from "./task";
+import UserList from "./userList";
 
 const Dashboard = () => {
   return (
@@ -10,6 +11,7 @@ const Dashboard = () => {
       <RecentActivity />
       <ProjectDashboard/>
       <TaskManager />
+      <UserList />
     </div>
   );
 };

@@ -1,58 +1,57 @@
-const express = require('express');
-const Project = require('../models/Project');
+const express = require("express");
+const Project = require("../models/Project");
 const router = express.Router();
 
 // Get all projects
-router.get('/get', async (req, res) => {
+router.get("/get", async (req, res) => {
   try {
     const projects = await Project.find();
     res.json(projects);
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: "Failed to fetch projects" });
   }
 });
 
-// Add new project
-// POST route to add a project
-router.post('/add', async (req, res) => {
-    try {
-      const { name, body, status, assignee, isActive } = req.body;
-  
-      // Create a new project object
-      const project = new Project({
-        name,
-        body,
-        status,
-        assignee,
-        isActive,
-      });
-  
-      // Save the project to the database
-      await project.save();
-      res.status(201).json(project);
-    } catch (err) {
-      console.error(err);
-      res.status(400).json({ error: 'Invalid data' });
-    }
-});
+// Add a project
+router.post("/add", async (req, res) => {
+  const { name, description, status, assignee } = req.body;
 
-// Update project
-router.put('/update/:id', async (req, res) => {
+  if (!name || !description) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
   try {
-    const project = await Project.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(project);
+    const newProject = new Project({ name, description, status, assignee });
+    await newProject.save();
+    res.json(newProject);
   } catch (err) {
-    res.status(400).json({ error: 'Invalid data' });
+    res.status(500).json({ error: "Failed to add project" });
   }
 });
 
-// Delete project
-router.delete('/delete/:id', async (req, res) => {
+// Update a project
+router.put("/update/:id", async (req, res) => {
+  const { name, description, status, assignee } = req.body;
+
+  try {
+    const updatedProject = await Project.findByIdAndUpdate(
+      req.params.id,
+      { name, description, status, assignee },
+      { new: true }
+    );
+    res.json(updatedProject);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update project" });
+  }
+});
+
+// Delete a project
+router.delete("/delete/:id", async (req, res) => {
   try {
     await Project.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Project deleted' });
+    res.json({ message: "Project deleted successfully" });
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: "Failed to delete project" });
   }
 });
 

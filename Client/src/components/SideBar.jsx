@@ -32,6 +32,14 @@ const Sidebar = () => {
         >
           Tasks
         </NavLink>
+        <NavLink
+        to="users"
+        className={({ isActive}) =>
+          `${linkStyle} ${isActive ? "bg-gray-300 font-bold" : ""}`
+        }
+        >
+          Users
+          </NavLink>
       </nav>
     </div>
   );
