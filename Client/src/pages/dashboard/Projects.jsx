@@ -12,7 +12,7 @@ const ProjectDashboard = () => {
   useEffect(() => {
     // Fetch projects from placeholder API
     axios
-      .get("http://localhost:5000/api/projects/")
+      .get("http://localhost:5000/api/projects/get")
       .then((response) => setProjects(response.data.slice(0, 6)));
 
     // Fetch users for assignments
@@ -89,7 +89,7 @@ const ProjectDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen p-6">
       {/* Header */}
       <header className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Project Dashboard</h1>

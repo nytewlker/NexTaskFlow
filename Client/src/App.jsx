@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -9,9 +9,9 @@ import TaskManager from "./pages/dashboard/task";
 import Dashboard from "./pages/dashboard/dsb";
 
 function App() {
-  // Dark mode aur user state
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
   const savedDarkMode = JSON.parse(localStorage.getItem("darkMode"));
-  const [darkMode, setDarkMode] = useState(savedDarkMode || false);
+  const [darkMode, setDarkMode] = useState(savedDarkMode ?? prefersDark);
   const [user, setUser] = useState(
     JSON.parse(localStorage.getItem("userData")) || null
   );
@@ -19,30 +19,23 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userData");
-    setUser(null); // Reset user state
+    setUser(null);
   };
 
   const handleLogin = (userData) => {
-    localStorage.setItem("userData", JSON.stringify(userData)); // Store user data
-    setUser(userData); // Update user state
+    localStorage.setItem("userData", JSON.stringify(userData));
+    setUser(userData);
   };
 
-  // Dark mode apply
   useEffect(() => {
     localStorage.setItem("darkMode", JSON.stringify(darkMode));
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-      document.documentElement.classList.remove("light");
-    } else {
-      document.documentElement.classList.add("light");
-      document.documentElement.classList.remove("dark");
-    }
+    document.documentElement.classList.toggle("dark", darkMode);
+    document.documentElement.classList.toggle("light", !darkMode);
   }, [darkMode]);
 
   return (
     <Router>
-      <div className={`antialiased h-full`}>
-        {/* Navbar */}
+      <div className="antialiased h-full">
         <Navbar
           darkMode={darkMode}
           setDarkMode={setDarkMode}
@@ -50,17 +43,20 @@ function App() {
           handleLogout={handleLogout}
         />
 
-        {/* Routes */}
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<DashboardLayout />}>
-            <Route index element={<Dashboard />} /> {/* Default route */}
+          <Route path="/" element={<Home handleLogin={handleLogin} />} />
+          <Route
+            path="/dashboard"
+            element={
+              user ? <DashboardLayout /> : <Navigate to="/" replace />
+            }
+          >
+            <Route index element={<Dashboard />} />
             <Route path="projects" element={<Projects />} />
             <Route path="tasks" element={<TaskManager />} />
           </Route>
         </Routes>
 
-        {/* Footer */}
         <Footer darkMode={darkMode} />
       </div>
     </Router>

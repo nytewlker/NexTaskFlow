@@ -85,7 +85,7 @@ const ContactTaskManager = () => {
                   value={formData.firstName}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 mt-2 rounded-md focus:outline-none"
+                  className="w-full px-4 py-3 mt-2 text-black rounded-md focus:outline-none"
                   placeholder="First name"
                 />
               </div>
@@ -97,7 +97,7 @@ const ContactTaskManager = () => {
                   value={formData.lastName}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 mt-2 rounded-md focus:outline-none"
+                  className="w-full px-4 py-3 mt-2 text-black rounded-md focus:outline-none"
                   placeholder="Last name"
                 />
               </div>
@@ -111,7 +111,7 @@ const ContactTaskManager = () => {
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-3 mt-2 rounded-md focus:outline-none"
+                className="w-full px-4 py-3 mt-2 text-black rounded-md focus:outline-none"
                 placeholder="you@example.com"
               />
             </div>
@@ -123,7 +123,7 @@ const ContactTaskManager = () => {
                 name="phoneNumber"
                 value={formData.phoneNumber}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 mt-2 rounded-md focus:outline-none"
+                className="w-full px-4 py-3 mt-2 text-black rounded-md focus:outline-none"
                 placeholder="+1 (555) 000-0000"
               />
             </div>

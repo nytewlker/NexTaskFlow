@@ -38,7 +38,7 @@ const Navbar = ({ darkMode, setDarkMode, user, handleLogout }) => {
   return (
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        isScrolled ? "p-2 shadow-md" : "p-4"
+        isScrolled ? "p-2 shadow-md " : "p-4"
       }`}
     >
       <div className="flex justify-between items-center px-4 md:px-4">

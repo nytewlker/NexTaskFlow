@@ -37,7 +37,7 @@ const TaskManagerHero = () => {
       </div>
 
       {/* Right Section */}
-      <div className="md:w-1/3 p-6 rounded-lg mt-6 md:mt-0 shadow-lg bg-slate-950 dark:bg-slate-800 bg-opacity-10 dark:bg-opacity-10">
+      <div className="md:w-1/3 p-8 rounded-lg mt-6 md:mt-0 shadow-lg bg-slate-950 dark:bg-slate-800 bg-opacity-10 dark:bg-opacity-10">
         <h2 className="text-lg font-semibold mb-4">Sign up today to start managing your tasks</h2>
 
         {/* Google Social Login Button */}
