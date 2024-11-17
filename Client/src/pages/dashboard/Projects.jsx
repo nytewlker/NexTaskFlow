@@ -66,7 +66,7 @@ const ProjectDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen p-6">
+    <div className=" p-6">
       <header className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Project Dashboard</h1>
         <button

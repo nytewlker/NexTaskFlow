@@ -167,7 +167,7 @@ const UserModal = ({ mode, user, onSave, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
+    <div className="fixed inset-0  flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-lg w-11/12 max-w-md">
         <h3 className="text-xl font-bold mb-4">{mode === 'create' ? 'Add User' : 'Edit User'}</h3>
         <form onSubmit={handleSubmit}>

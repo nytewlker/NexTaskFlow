@@ -42,7 +42,7 @@ const TaskManager = () => {
   };
 
   return (
-    <div id="tasks"className="min-h-screen py-10">
+    <div id="tasks"className=" py-10">
       {/* Header */}
       <header className="py-10 p-4">
         <div className="flex justify-between items-center">

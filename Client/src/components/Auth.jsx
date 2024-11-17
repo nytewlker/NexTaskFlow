@@ -42,7 +42,7 @@ const Auth = () => {
     email: "",
     password: "",
     name: "",
-    role: "user",
+    role: "employee",
     verificationCode: "",
     newPassword: "",
   });
@@ -164,8 +164,9 @@ const Auth = () => {
               onChange={handleInputChange}
               className="w-full px-3 py-2 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="user">User</option>
               <option value="admin">Admin</option>
+              <option value="manager">Manager</option>
+              <option value="employee">Employee</option>
             </select>
           </div>
         </>
