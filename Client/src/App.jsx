@@ -37,6 +37,7 @@ function App() {
 
   return (
     <Router>
+      
       <div className="antialiased h-full">
         <Navbar
           darkMode={darkMode}

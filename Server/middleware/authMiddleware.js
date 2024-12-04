@@ -1,19 +1,39 @@
-const jwt = require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
+const User = require("../models/u");
 
-const protect = (req, res, next) => {
-    const authHeader = req.headers.authorization
-    if (authHeader) {
-        const token = authHeader.split(' ')[1]
-        jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-            if (err) {
-                return res.status(403).json({ message: "Invalid token" })
-            }
-            req.user = user
-            next()
-        })
-    } else {
-        res.status(401).json({ message: "No token provided" })
+const authenticate = async (req, res, next) => {
+  try {
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+
+    if (!token) {
+      return res.status(401).json({ message: "Authentication token missing" });
     }
-}
 
-module.exports = { protect }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    res.status(401).json({ message: "Invalid authentication token" });
+  }
+};
+
+const authorize = (roles) => {
+    return (req, res, next) => {
+      if (!roles.includes(req.user.role)) {
+        return res.status(403).json({ message: "Access forbidden: insufficient permissions" });
+      }
+      next();
+    };
+  };
+
+
+module.exports = {
+    authenticate,
+    authorize,
+};

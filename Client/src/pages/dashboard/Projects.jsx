@@ -1,30 +1,37 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { FaEdit, FaTrash, FaEye, FaPlus } from "react-icons/fa";
 
 const ProjectDashboard = () => {
   const [projects, setProjects] = useState([]);
   const [users, setUsers] = useState([]);
-  const [modalData, setModalData] = useState({
-    isOpen: false,
-    project: null,
-    mode: "add", // "add", "edit", "view"
-  });
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [modalMode, setModalMode] = useState("add");
+  const [isModalOpen, setModalOpen] = useState(false);
 
+  const token = localStorage.getItem("token");
+
+  // Fetch projects from the backend
   const fetchProjects = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/projects/get");
+      const { data } = await axios.get("http://localhost:5000/api/projects", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setProjects(data);
     } catch (err) {
-      console.error("Error fetching projects:", err);
+      console.error("Failed to fetch projects:", err);
     }
   };
 
+  // Fetch users from the backend
   const fetchUsers = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/users");
+      const { data } = await axios.get("http://localhost:5000/api/users", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setUsers(data);
     } catch (err) {
-      console.error("Error fetching users:", err);
+      console.error("Failed to fetch users:", err);
     }
   };
 
@@ -33,162 +40,318 @@ const ProjectDashboard = () => {
     fetchUsers();
   }, []);
 
-  const handleModal = (project = null, mode = "add") => {
-    setModalData({ isOpen: true, project, mode });
+  const handleModalOpen = (project = null, mode = "add") => {
+    setSelectedProject(project);
+    setModalMode(mode);
+    setModalOpen(true);
   };
 
-  const closeModal = () => {
-    setModalData({ isOpen: false, project: null, mode: "add" });
+  const handleModalClose = () => {
+    setSelectedProject(null);
+    setModalMode("add");
+    setModalOpen(false);
   };
 
   const handleSaveProject = async (project) => {
+    const endpoint =
+      modalMode === "edit"
+        ? `http://localhost:5000/api/projects/${project._id}`
+        : "http://localhost:5000/api/projects";
+
+    const method = modalMode === "edit" ? "put" : "post";
+
     try {
-      if (modalData.mode === "edit") {
-        await axios.put(`http://localhost:5000/api/projects/update/${project._id}`, project);
-      } else {
-        const { data } = await axios.post("http://localhost:5000/api/projects/add", project);
-        setProjects((prev) => [...prev, data]);
-      }
-      closeModal();
-      fetchProjects();
+      const { data } = await axios[method](endpoint, project, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      setProjects((prevProjects) =>
+        modalMode === "edit"
+          ? prevProjects.map((p) => (p._id === data.project._id ? data.project : p))
+          : [...prevProjects, data.project]
+      );
+      handleModalClose();
     } catch (err) {
-      console.error("Error saving project:", err);
+      console.error("Failed to save project:", err);
     }
   };
 
   const handleDeleteProject = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this project?")) return;
+
     try {
-      await axios.delete(`http://localhost:5000/api/projects/delete/${id}`);
-      setProjects((prev) => prev.filter((p) => p._id !== id));
+      await axios.delete(`http://localhost:5000/api/projects/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProjects((prevProjects) => prevProjects.filter((p) => p._id !== id));
     } catch (err) {
-      console.error("Error deleting project:", err);
+      console.error("Failed to delete project:", err);
+    }
+  };
+
+  const handleRemoveTeamMember = async (projectId, userId) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/projects/${projectId}/team`, {
+        data: { userId },
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // Refresh projects after removal
+      fetchProjects();
+    } catch (err) {
+      console.error("Failed to remove team member:", err);
     }
   };
 
   return (
-    <div className=" p-6">
+    <div className="p-6 bg-gray-100 min-h-screen">
       <header className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Project Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-700">Project Dashboard</h1>
         <button
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          onClick={() => handleModal()}
+          className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          onClick={() => handleModalOpen()}
         >
+          <FaPlus className="mr-2" />
           Add New Project
         </button>
       </header>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {projects.map((project) => (
-          <div key={project._id} className="bg-white p-4 rounded shadow">
-            <h2 className="font-bold mb-2">{project.name}</h2>
-            <p className="text-sm text-gray-600 mb-4">{project.description}</p>
-            <div className="flex justify-between">
-              <button
-                className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                onClick={() => handleModal(project, "view")}
-              >
-                View
-              </button>
-              <button
-                className="bg-yellow-400 text-white px-3 py-1 rounded hover:bg-yellow-500"
-                onClick={() => handleModal(project, "edit")}
-              >
-                Edit
-              </button>
-              <button
-                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                onClick={() => handleDeleteProject(project._id)}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
+          <ProjectCard
+            key={project._id}
+            project={project}
+            onView={() => handleModalOpen(project, "view")}
+            onEdit={() => handleModalOpen(project, "edit")}
+            onDelete={() => handleDeleteProject(project._id)}
+          />
         ))}
       </div>
 
-      {modalData.isOpen && (
-        <Modal
-          data={modalData}
+      {isModalOpen && (
+        <ProjectModal
+          mode={modalMode}
+          project={selectedProject}
           users={users}
-          onClose={closeModal}
+          onClose={handleModalClose}
           onSave={handleSaveProject}
+          token={token} // Pass the token as a prop
+
         />
       )}
     </div>
   );
 };
-
-const Modal = ({ data, users, onClose, onSave }) => {
-  const [project, setProject] = useState(
-    data.project || { name: "", description: "", status: "Pending", assignee: "" }
+  const ProjectCard = ({ project, onView, onEdit, onDelete }) => (
+    <div className="bg-white p-4 rounded shadow hover:shadow-lg">
+      <h3 className="font-bold text-lg">{project.title}</h3>
+      <p className="text-sm text-gray-600 mb-4">{project.description}</p>
+    
+      {/* Add manager info */}
+      <p className="text-sm text-gray-600">
+        Manager: {project.manager?.name || 'Not Assigned'}
+      </p>
+    
+      {/* Add team members count */}
+      <p className="text-sm text-gray-600">
+        Team Size: {project.team?.length || 0} members
+      </p>
+    
+      {/* Add tasks count */}
+      <p className="text-sm text-gray-600 mb-4">
+        Tasks: {project.tasks?.length || 0}
+      </p>
+    
+      <div className="flex justify-between space-x-2">
+        <button
+          className="flex items-center bg-green-500 text-white px-3 py-1 rounded"
+          onClick={onView}
+        >
+          <FaEye className="mr-2" /> View
+        </button>
+        <button
+          className="flex items-center bg-yellow-400 text-white px-3 py-1 rounded"
+          onClick={onEdit}
+        >
+          <FaEdit className="mr-2" /> Edit
+        </button>
+        <button
+          className="flex items-center bg-red-500 text-white px-3 py-1 rounded"
+          onClick={onDelete}
+        >
+          <FaTrash className="mr-2" /> Delete
+        </button>
+      </div>
+    </div>
+  );
+const ProjectModal = ({ mode, project, users, onClose, onSave }) => {
+  const [formState, setFormState] = useState(
+    project || {
+      title: "",
+      description: "",
+      startDate: "",
+      endDate: "",
+      managerId: "",
+      team: []
+    }
   );
 
+  const [selectedTeamMember, setSelectedTeamMember] = useState("");
+  const [selectedRole, setSelectedRole] = useState("");
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormState((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formState);
+  };
+
+  const handleAddTeamMember = async () => {
+    try {
+      await axios.post(`http://localhost:5000/api/projects/${project._id}/team`, {
+        userId: selectedTeamMember,
+        role: selectedRole
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // Refresh project data
+      fetchProjects();
+    } catch (err) {
+      console.error("Failed to add team member:", err);
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-lg w-11/12 max-w-md">
-        <h3 className="text-xl font-bold mb-4">
-          {data.mode === "view"
-            ? "Project Details"
-            : data.mode === "edit"
-              ? "Edit Project"
-              : "Add Project"}
-        </h3>
-        {data.mode === "view" ? (
-          <div>
-            <p><strong>Name:</strong> {project.name}</p>
-            <p><strong>Description:</strong> {project.description}</p>
-            <p><strong>Status:</strong> {project.status}</p>
-            <p>
-              <strong>Assigned To:</strong>{" "}
-              {users.find((u) => u._id === project.assignee)?.name || "Unassigned"}
-            </p>
-            <button className="mt-4 bg-gray-300 px-4 py-2 rounded" onClick={onClose}>
-              Close
-            </button>
-          </div>
-        ) : (
-          <div>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      <div className="bg-white rounded p-6 w-11/12 max-w-md">
+        <h2 className="text-xl font-bold mb-4">
+          {mode === "view"
+            ? "View Project"
+            : mode === "edit"
+            ? "Edit Project"
+            : "Add Project"}
+        </h2>
+        {mode !== "view" ? (
+          <form onSubmit={handleSubmit}>
             <input
-              type="text"
-              className="w-full mb-4 px-3 py-2 border rounded"
-              placeholder="Project name"
-              value={project.name}
-              onChange={(e) => setProject({ ...project, name: e.target.value })}
+              name="title"
+              value={formState.title}
+              onChange={handleChange}
+              placeholder="Project Title"
+              className="w-full mb-4 p-2 border rounded"
+              required
             />
             <textarea
-              className="w-full mb-4 px-3 py-2 border rounded"
-              placeholder="Description"
-              value={project.description}
-              onChange={(e) => setProject({ ...project, description: e.target.value })}
+              name="description"
+              value={formState.description}
+              onChange={handleChange}
+              placeholder="Project Description"
+              className="w-full mb-4 p-2 border rounded"
             />
+            <div className="flex gap-2">
+              <input
+                type="date"
+                name="startDate"
+                value={formState.startDate}
+                onChange={handleChange}
+                className="w-1/2 p-2 border rounded"
+              />
+              <input
+                type="date"
+                name="endDate"
+                value={formState.endDate}
+                onChange={handleChange}
+                className="w-1/2 p-2 border rounded"
+              />
+            </div>
             <select
-              className="w-full mb-4 px-3 py-2 border rounded"
-              value={project.assignee}
-              onChange={(e) => setProject({ ...project, assignee: e.target.value })}
+              name="managerId"
+              value={formState.managerId}
+              onChange={handleChange}
+              className="w-full mt-4 p-2 border rounded"
             >
-              <option value="">Assign To</option>
+              <option value="">Select Manager</option>
               {users.map((user) => (
                 <option key={user._id} value={user._id}>
                   {user.name}
                 </option>
               ))}
             </select>
-            <div className="flex justify-end space-x-2">
-              <button className="bg-gray-300 px-4 py-2 rounded" onClick={onClose}>
-                Cancel
-              </button>
-              <button
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                onClick={() => onSave(project)}
-              >
-                {data.mode === "edit" ? "Save Changes" : "Add Project"}
-              </button>
+            <button
+              type="submit"
+              className="bg-blue-500 text-white w-full py-2 mt-4 rounded"
+            >
+              Save
+            </button>
+          </form>
+        ) : (
+          <div>
+            <p>
+              <strong>Title:</strong> {project.title}
+            </p>
+            <p>
+              <strong>Description:</strong> {project.description}
+            </p>
+            <div className="mt-4">
+              <h3 className="font-bold">Team Members</h3>
+              <ul>
+                {project.team?.map(member => (
+                  <li key={member.user._id} className="flex justify-between items-center">
+                    <span>{member.user.name} - {member.role}</span>
+                    <button 
+                      onClick={() => handleRemoveTeamMember(member.user._id)}
+                      className="text-red-500"
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              
+              <div className="mt-4">
+                <select 
+                  value={selectedTeamMember}
+                  onChange={(e) => setSelectedTeamMember(e.target.value)}
+                  className="w-full p-2 border rounded mb-2"
+                >
+                  <option value="">Select Team Member</option>
+                  {users.map(user => (
+                    <option key={user._id} value={user._id}>{user.name}</option>
+                  ))}
+                </select>
+                
+                <input
+                  type="text"
+                  value={selectedRole}
+                  onChange={(e) => setSelectedRole(e.target.value)}
+                  placeholder="Role"
+                  className="w-full p-2 border rounded mb-2"
+                />
+                
+                <button
+                  onClick={handleAddTeamMember}
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                >
+                  Add Team Member
+                </button>
+              </div>
             </div>
+            <button
+              className="bg-gray-400 text-white w-full py-2 mt-4 rounded"
+              onClick={onClose}
+            >
+              Close
+            </button>
           </div>
         )}
       </div>
     </div>
   );
 };
-
 export default ProjectDashboard;

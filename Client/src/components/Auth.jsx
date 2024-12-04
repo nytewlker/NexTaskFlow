@@ -5,17 +5,17 @@ import { useNavigate } from "react-router-dom";
 const apiRequest = async (endpoint, method, body) => {
   const baseURL = "http://localhost:5000/api";
   const url = `${baseURL}/${endpoint}`;
-  
+
   const response = await fetch(url, {
     method,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  
+
   if (!response.ok) {
     throw new Error(await response.text());
   }
-  
+
   return response.json();
 };
 
@@ -36,7 +36,7 @@ const InputField = ({ label, type, name, value, onChange, placeholder }) => (
 
 const Auth = () => {
   const navigate = useNavigate();
-  
+
   // Form Data State
   const [formData, setFormData] = useState({
     email: "",
@@ -46,7 +46,7 @@ const Auth = () => {
     verificationCode: "",
     newPassword: "",
   });
-  
+
   // UI State
   const [uiState, setUiState] = useState({
     isLogin: true,
@@ -69,9 +69,9 @@ const Auth = () => {
   const handleAuthSubmit = async (e) => {
     e.preventDefault();
     setUiState((prev) => ({ ...prev, loading: true, error: null }));
-
+  
     try {
-      const endpoint = uiState.isLogin ? "auth/login" : "auth/signup";
+      const endpoint = uiState.isLogin ? "users/login" : "users/register";
       const body = uiState.isLogin
         ? { email: formData.email, password: formData.password }
         : {
@@ -80,23 +80,24 @@ const Auth = () => {
             password: formData.password,
             role: formData.role,
           };
-
+  
       const data = await apiRequest(endpoint, "POST", body);
-
+  
       if (data.token) {
+        // Save all the user details from backend response
         localStorage.setItem("token", data.token);
         localStorage.setItem(
           "userData",
           JSON.stringify({
-            email: formData.email,
-            name: data.name || formData.name,
-            role: data.role,
-            id: data.id,
+            id: data.user._id, // Save user ID
+            name: data.user.name, // Save user name
+            email: data.user.email, // Save email
+            role: data.user.role, // Save user role
           })
         );
-
+  
         setUiState((prev) => ({ ...prev, success: true }));
-        navigate(data.role === "admin" ? "/dsb" : "/Dashboard");
+        navigate(data.user.role === "admin" ? "/dashboard" : "/userPanel");
       }
     } catch (error) {
       setUiState((prev) => ({ ...prev, error: error.message }));
@@ -104,6 +105,7 @@ const Auth = () => {
       setUiState((prev) => ({ ...prev, loading: false }));
     }
   };
+  
 
   // Handle Forgot Password
   const handleForgotPassword = async (e) => {
@@ -112,8 +114,8 @@ const Auth = () => {
 
     try {
       const endpoint = uiState.isCodeSent
-        ? "auth/reset-password"
-        : "auth/forgot-password";
+        ? "users/reset-password"
+        : "users/request-password-reset";
       const body = uiState.isCodeSent
         ? {
             email: formData.email,
@@ -141,6 +143,53 @@ const Auth = () => {
       setUiState((prev) => ({ ...prev, loading: false }));
     }
   };
+
+  // Render Forgot Password Form
+  const renderForgotPasswordForm = () => (
+    <form className="space-y-4" onSubmit={handleForgotPassword}>
+      <InputField
+        label="Email"
+        type="email"
+        name="email"
+        value={formData.email}
+        onChange={handleInputChange}
+        placeholder="email@example.com"
+      />
+
+      {uiState.isCodeSent && (
+        <>
+          <InputField
+            label="Verification Code"
+            type="text"
+            name="verificationCode"
+            value={formData.verificationCode}
+            onChange={handleInputChange}
+            placeholder="Enter code"
+          />
+          <InputField
+            label="New Password"
+            type="password"
+            name="newPassword"
+            value={formData.newPassword}
+            onChange={handleInputChange}
+            placeholder="New password"
+          />
+        </>
+      )}
+
+      <button
+        type="submit"
+        disabled={uiState.loading}
+        className={`w-full py-2 mt-4 rounded-md font-semibold ${
+          uiState.loading
+            ? "bg-gray-500"
+            : "bg-blue-600 hover:bg-blue-700 text-white"
+        }`}
+      >
+        {uiState.loading ? "Processing..." : uiState.isCodeSent ? "Reset Password" : "Send Code"}
+      </button>
+    </form>
+  );
 
   // Render Login/Signup Form
   const renderAuthForm = () => (
@@ -205,99 +254,6 @@ const Auth = () => {
           ? "Log In"
           : "Create Account"}
       </button>
-
-      <div className="flex justify-between items-center mt-4">
-        <button
-          type="button"
-          onClick={() =>
-            setUiState((prev) => ({ ...prev, isLogin: !prev.isLogin }))
-          }
-          className="text-blue-500 hover:text-blue-600"
-        >
-          {uiState.isLogin ? "Create account" : "Back to login"}
-        </button>
-
-        {uiState.isLogin && (
-          <button
-            type="button"
-            onClick={() =>
-              setUiState((prev) => ({ ...prev, isForgotPassword: true }))
-            }
-            className="text-blue-500 hover:text-blue-600"
-          >
-            Forgot Password?
-          </button>
-        )}
-      </div>
-    </form>
-  );
-
-  // Render Forgot Password Form
-  const renderForgotPasswordForm = () => (
-    <form className="space-y-4" onSubmit={handleForgotPassword}>
-      <h3 className="text-xl font-bold text-center mb-4">Reset Password</h3>
-
-      <InputField
-        label="Email"
-        type="email"
-        name="email"
-        value={formData.email}
-        onChange={handleInputChange}
-        placeholder="Enter your email"
-      />
-
-      {uiState.isCodeSent && (
-        <>
-          <InputField
-            label="Verification Code"
-            type="text"
-            name="verificationCode"
-            value={formData.verificationCode}
-            onChange={handleInputChange}
-            placeholder="Enter verification code"
-          />
-
-          <InputField
-            label="New Password"
-            type="password"
-            name="newPassword"
-            value={formData.newPassword}
-            onChange={handleInputChange}
-            placeholder="Enter new password"
-          />
-        </>
-      )}
-
-      <button
-        type="submit"
-        disabled={uiState.loading}
-        className={`w-full py-2 mt-4 rounded-md font-semibold ${
-          uiState.loading
-            ? "bg-gray-500"
-            : "bg-blue-600 hover:bg-blue-700 text-white"
-        }`}
-      >
-        {uiState.loading
-          ? "Processing..."
-          : uiState.isCodeSent
-          ? "Reset Password"
-          : "Send Verification Code"}
-      </button>
-
-      <button
-        type="button"
-        onClick={() =>
-          setUiState((prev) => ({
-            ...prev,
-            isForgotPassword: false,
-            isCodeSent: false,
-            error: null,
-          }))
-        }
-        className="w-full text-center text-sm text-blue-500 hover:text-blue-600"
-      >
-        Back to Login
-      </button>
     </form>
   );
 
@@ -320,6 +276,23 @@ const Auth = () => {
       {uiState.isForgotPassword
         ? renderForgotPasswordForm()
         : renderAuthForm()}
+
+      <div className="mt-4 text-center">
+        {!uiState.isForgotPassword && (
+          <button
+            onClick={() => setUiState(prev => ({ ...prev, isLogin: !prev.isLogin }))}
+            className="text-blue-500 hover:text-blue-700"
+          >
+            {uiState.isLogin ? "Create new account" : "Back to login"}
+          </button>
+        )}
+        <button
+          onClick={() => setUiState(prev => ({ ...prev, isForgotPassword: !prev.isForgotPassword }))}
+          className="text-blue-500 hover:text-blue-700 ml-4"
+        >
+          {uiState.isForgotPassword ? "Back to login" : "Forgot Password?"}
+        </button>
+      </div>
     </div>
   );
 };
