@@ -14,7 +14,7 @@ const ProjectDashboard = () => {
   // Fetch projects from the backend
   const fetchProjects = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/projects", {
+      const { data } = await axios.get("https://nextaskflow.onrender.com/api/projects", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProjects(data);
@@ -26,7 +26,7 @@ const ProjectDashboard = () => {
   // Fetch users from the backend
   const fetchUsers = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/users", {
+      const { data } = await axios.get("https://nextaskflow.onrender.com/api/users", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(data);
@@ -55,8 +55,8 @@ const ProjectDashboard = () => {
   const handleSaveProject = async (project) => {
     const endpoint =
       modalMode === "edit"
-        ? `http://localhost:5000/api/projects/${project._id}`
-        : "http://localhost:5000/api/projects";
+        ? `https://nextaskflow.onrender.com/api/projects/${project._id}`
+        : "https://nextaskflow.onrender.com/api/projects";
 
     const method = modalMode === "edit" ? "put" : "post";
 
@@ -82,7 +82,7 @@ const ProjectDashboard = () => {
     if (!window.confirm("Are you sure you want to delete this project?")) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/projects/${id}`, {
+      await axios.delete(`https://nextaskflow.onrender.com/api/projects/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProjects((prevProjects) => prevProjects.filter((p) => p._id !== id));
@@ -93,7 +93,7 @@ const ProjectDashboard = () => {
 
   const handleRemoveTeamMember = async (projectId, userId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/projects/${projectId}/team`, {
+      await axios.delete(`https://nextaskflow.onrender.com/api/projects/${projectId}/team`, {
         data: { userId },
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -213,7 +213,7 @@ const ProjectModal = ({ mode, project, users, onClose, onSave }) => {
 
   const handleAddTeamMember = async () => {
     try {
-      await axios.post(`http://localhost:5000/api/projects/${project._id}/team`, {
+      await axios.post(`https://nextaskflow.onrender.com/api/projects/${project._id}/team`, {
         userId: selectedTeamMember,
         role: selectedRole
       }, {

@@ -6,7 +6,7 @@ import ForgotPasswordForm from "./ForgotPasswordForm";
 
 // Utility function for API requests
 const apiRequest = async (endpoint, method, body) => {
-  const baseURL = "http://localhost:5000/api";
+  const baseURL = "https://nextaskflow.onrender.com/api";
   const url = `${baseURL}/${endpoint}`;
 
   const response = await fetch(url, {

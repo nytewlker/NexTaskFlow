@@ -37,7 +37,7 @@ const ContactTaskManager = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/contact', {
+      const response = await axios.post('https://nextaskflow.onrender.com/api/contact', {
         formData: {
           name: `${formData.firstName} ${formData.lastName}`,
           email: formData.email,
