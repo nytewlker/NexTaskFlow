@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-import Home from "./pages/Home";
-import DashboardLayout from "./pages/dashboard/DashboardLayout";
-import Projects from "./pages/dashboard/Projects";
-import TaskManager from "./pages/dashboard/task";
-import Dashboard from "./pages/dashboard/dsb";
-
-import UserList from "./pages/dashboard/userList";
+import Layout from "./components/layout/layout";
+import Home from "./pages/Home/Home";
+import DashboardLayout from "./pages/dashboard/dasb-componnets/DashboardLayout";
+import Projects from "./pages/dashboard/dasb-componnets/Projects";
+import TaskManager from "./pages/dashboard/dasb-componnets/task";
+import Dashboard from "./pages/dashboard/dasb-componnets/dsb";
+import UserList from "./pages/dashboard/dasb-componnets/userList";
 
 function App() {
   const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -37,17 +35,15 @@ function App() {
 
   return (
     <Router>
-      
-      <div className="antialiased h-full">
-        <Navbar
-          darkMode={darkMode}
-          setDarkMode={setDarkMode}
-          user={user}
-          handleLogout={handleLogout}
-        />
-
         <Routes>
-          <Route path="/" element={<Home handleLogin={handleLogin} />} />
+          <Route path="/" element={<Layout 
+            darkMode={darkMode} 
+            setDarkMode={setDarkMode} 
+            user={user} 
+            handleLogout={handleLogout} 
+          />}> 
+            <Route index element={<Home handleLogin={handleLogin} />} />
+          </Route>
           <Route
             path="/dashboard"
             element={
@@ -60,9 +56,6 @@ function App() {
             <Route path="users" element={<UserList />} />
           </Route>
         </Routes>
-
-        <Footer darkMode={darkMode} />
-      </div>
     </Router>
   );
 }

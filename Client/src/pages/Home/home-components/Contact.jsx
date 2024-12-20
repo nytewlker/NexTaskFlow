@@ -68,7 +68,7 @@ const ContactTaskManager = () => {
     <section id="contact" className="flex flex-col md:flex-row items-center justify-between px-8 py-12 min-h-screen">
       <div className="max-w-screen-xl mx-auto px-8 grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Contact Form */}
-        <div>
+        <div className="p-6 rounded-lg mt-8 md:mt-0 shadow-lg bg-black/10 dark:bg-white/10">
           <h2 className="text-4xl font-bold mb-8">Get in Touch</h2>
           <p className="mb-6">
             We're here to support you with any task management queries, setup assistance, or feature inquiries. Reach out, and we'll respond as soon as possible.

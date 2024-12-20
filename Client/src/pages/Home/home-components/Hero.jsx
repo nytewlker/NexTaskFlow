@@ -1,13 +1,14 @@
 import React from "react";
-import Auth from "./Auth"; // Import the Auth component
+import Auth from "../../../components/Auth"; // Import the Auth component
 import { motion } from "framer-motion"; // For animations
 
 const TaskManagerHero = () => {
   return (
-    <div className="flex flex-col md:flex-row items-center justify-between px-8 py-12 min-h-screen bg-gradient-to-br">
+    <div className="flex  flex-col md:flex-row items-center justify-between px-8 py-12 min-h-screen">
+      
       {/* Left Section */}
       <motion.div
-        className="md:w-1/2 space-y-6 text-gray-900 dark:text-gray-100"
+        className="md:w-2/3 space-y-6 text-gray-900 dark:text-gray-100"
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
@@ -55,7 +56,7 @@ const TaskManagerHero = () => {
 
       {/* Right Section */}
       <motion.div
-        className="md:w-1/3 p-6 rounded-lg mt-8 md:mt-0 shadow-lg bg-indigo-100 dark:bg-gray-800 bg-opacity-50 dark:bg-opacity-50"
+        className="md:w-1/3 p-6 rounded-lg mt-8 md:mt-0 shadow-lg bg-black/10 dark:bg-white/10"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
@@ -67,7 +68,7 @@ const TaskManagerHero = () => {
         {/* Google Social Login Button */}
         <Auth />
       </motion.div>
-    </div>
+      </div>
   );
 };
 
