@@ -10,7 +10,7 @@ require("dotenv").config();
 const app = express();
 app.use(bodyParser.json());
 app.use(cors({
-  origin: 'https://careervista.vercel.app',
+  origin: 'https://nextaskflow.vercel.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   credentials: true,
 }));
