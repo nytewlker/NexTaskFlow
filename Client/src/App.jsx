@@ -49,7 +49,10 @@ function App() {
           <Route
             path="/dashboard"
             element={
-              user ? <DashboardLayout /> : <Navigate to="/" replace />
+              user ? <DashboardLayout darkMode={darkMode} 
+              setDarkMode={setDarkMode} 
+              user={user} 
+              handleLogout={handleLogout}  /> : <Navigate to="/" replace />
             }
           >
             <Route index element={<Dashboard />} />

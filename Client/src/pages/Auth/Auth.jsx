@@ -73,7 +73,7 @@ const Auth = ({ handleLogin }) => {
 
   return (
     <div className="auth-container border p-4 rounded">
-      <h2>{uiState.isLogin ? "Login" : uiState.isForgotPassword ? "Reset Password" : "Signup"}</h2>
+      <h2 className="text-center text-xl bold">{uiState.isLogin ? "Login" : uiState.isForgotPassword ? "Reset Password" : "Signup"}</h2>
       {uiState.error && <p className="error">{uiState.error}</p>}
       {uiState.success && <p className="success">Action successful!</p>}
       {uiState.isLogin ? (
@@ -83,11 +83,36 @@ const Auth = ({ handleLogin }) => {
       ) : (
         <SignupForm formData={formData} handleInputChange={handleInputChange} handleAuthSubmit={handleAuthSubmit} loading={uiState.loading} />
       )}
-      <button onClick={() => setUiState((prev) => ({ ...prev, isLogin: !uiState.isLogin }))}>
-        {uiState.isLogin ? "Create Account" : "Login"}
-      </button>
-      {!uiState.isForgotPassword && <button onClick={() => setUiState((prev) => ({ ...prev, isForgotPassword: true }))}>Forgot Password?</button>}
-    </div>
+       <div className="mt-4 text-center">
+        {!uiState.isForgotPassword && (
+          <button
+            onClick={() =>
+              setUiState((prev) => ({
+                ...prev,
+                isLogin: !prev.isLogin,
+                error: null,
+                success: false,
+              }))
+            }
+            className="text-blue-500 hover:text-blue-700"
+          >
+            {uiState.isLogin ? "Create new account" : "Back to login"}
+          </button>
+        )}
+        <button
+          onClick={() =>
+            setUiState((prev) => ({
+              ...prev,
+              isForgotPassword: !prev.isForgotPassword,
+              error: null,
+              success: false,
+            }))
+          }
+          className="text-blue-500 hover:text-blue-700 ml-4"
+        >
+          {uiState.isForgotPassword ? "Back to login" : "Forgot Password?"}
+        </button>
+      </div></div>
   );
 };
 
