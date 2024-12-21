@@ -8,8 +8,12 @@ const contactRoutes = require("./routes/contactRoutes");
 require("dotenv").config();
 
 const app = express();
-app.use(cors( {origin: 'https://careervista.vercel.app'}));
 app.use(bodyParser.json());
+app.use(cors({
+  origin: 'https://careervista.vercel.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  credentials: true,
+}));
 dbConnect();
 
 app.use("/api/users", userRoutes);
