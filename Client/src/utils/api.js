@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const baseURL = "http://localhost:5000/api/";
+export const baseURL = "https://nextaskflow.onrender.com/api/";
 
 export const apiRequest = async (endpoint, method, body) => {
   const url = `${baseURL}${endpoint}`;
