@@ -78,7 +78,7 @@ const authController = {
                 return res.status(400).json({ message: "Invalid verification code" });
             }
 
-            user.password = await newPassword
+            user.password = await bcrypt.hash(newPassword, 10);
             user.verificationCode = undefined;
             await user.save();
 

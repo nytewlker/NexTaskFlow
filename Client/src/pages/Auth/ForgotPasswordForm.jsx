@@ -1,5 +1,6 @@
 import React from "react";
-import InputField from "./InputField";
+import InputField from "../../components/common/Input";
+import Button from "../../components/common/Button";
 
 const ForgotPasswordForm = ({
   formData,
@@ -37,15 +38,9 @@ const ForgotPasswordForm = ({
         />
       </>
     )}
-    <button
-      type="submit"
-      disabled={loading}
-      className={`w-full py-2 mt-4 rounded-md font-semibold ${
-        loading ? "bg-gray-500" : "bg-blue-600 hover:bg-blue-700 text-white"
-      }`}
-    >
+    <Button type="submit" disabled={loading}>
       {loading ? "Processing..." : isCodeSent ? "Reset Password" : "Send Code"}
-    </button>
+    </Button>
   </form>
 );
 

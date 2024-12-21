@@ -1,7 +1,7 @@
 import React from "react";
 import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
 
-const Footer = ({ darkMode }) => {  // Destructure darkMode from props
+const Footer = () => {  // Destructure darkMode from props
   return (
     <footer
       className={`relative p5 bottom-0 w-full p-4 text-center`}

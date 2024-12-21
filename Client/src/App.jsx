@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+
+
 import Layout from "./components/layout/layout";
 import Home from "./pages/Home/Home";
+
+
 import DashboardLayout from "./pages/dashboard/dasb-componnets/DashboardLayout";
-import Projects from "./pages/dashboard/dasb-componnets/Projects";
 import TaskManager from "./pages/dashboard/dasb-componnets/task";
-import Dashboard from "./pages/dashboard/dasb-componnets/dsb";
-import UserList from "./pages/dashboard/dasb-componnets/userList";
+import Dashboard from "./pages/dashboard/Dashboard";
 
 function App() {
   const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -51,9 +53,8 @@ function App() {
             }
           >
             <Route index element={<Dashboard />} />
-            <Route path="projects" element={<Projects />} />
             <Route path="tasks" element={<TaskManager />} />
-            <Route path="users" element={<UserList />} />
+            
           </Route>
         </Routes>
     </Router>
